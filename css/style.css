@@ -2,7 +2,7 @@ body{
     background-color: #212529 !important;
     font-size: .875rem;
 }
-#chart{
+#temperatur{
     min-width: 900px;
     /*max-width: 50%;*/
     /*max-width: 400px;*/
