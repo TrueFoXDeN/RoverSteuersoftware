@@ -40,49 +40,10 @@
 
 
     <!-- Custom styles for this template -->
-    <link href="css/styletest.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
 
-    <script>
-        window.Promise ||
-        document.write(
-            '<script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"><\/script>'
-        )
-        window.Promise ||
-        document.write(
-            '<script src="https://cdn.jsdelivr.net/npm/eligrey-classlist-js-polyfill@1.2.20171210/classList.min.js"><\/script>'
-        )
-        window.Promise ||
-        document.write(
-            '<script src="https://cdn.jsdelivr.net/npm/findindex_polyfill_mdn"><\/script>'
-        )
-    </script>
-    <script>
-        var data = []
+    <script src="js/promises.js"></script>
 
-        function getNewSeries(date, yrange) {
-
-            data.push({
-                x: date,
-                y: Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
-            })
-        }
-
-        function removeData() {
-            // Alternatively, you can also reset the data at certain intervals to prevent creating a huge series
-            if (data.length % 60 === 0) {
-                console.log(data)
-            }
-            if (data.length > 120) {
-                data.shift()
-            }
-            // if(data.length > 160){
-            //     console.log(data)
-            //     // data = data.slice(data.length - 130, data.length);
-            //     console.log(data)
-            // }
-        }
-
-    </script>
 </head>
 <body>
 
@@ -98,7 +59,7 @@
 
 <div class="container-fluid">
     <div class="row">
-        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -136,7 +97,7 @@
                 <h1 class="h2">Dashboard</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
 
-                    <button type="button" class="btn btn-sm btn-outline-secondary">
+                    <button type="button" class="btn btn-sm btn-outline-secondary btn-outline-light">
                         <span data-feather="download-cloud"></span>
                         Export
                     </button>
@@ -144,268 +105,22 @@
             </div>
 
             <div class="row">
-                <div class="col-md-12" id="temperatur"></div>
+                <div class="col-md-12 chart" id="temperatur"></div>
             </div>
             <div class="row">
-                <div class="col-md-4" id="akku"></div>
-                <div class="col-md-8" id="stromsensoren"></div>
+                <div class="col-md-4 chart" id="akku"></div>
+                <div class="col-md-8 chart" id="stromsensoren"></div>
             </div>
 
         </main>
     </div>
-    <script>
+</div>
+<script src="js/charts.js"></script>
 
-        var optionsTemperatur = {
-            series: [{
-                data: data.slice()
-            }],
-            theme: {
-                mode: 'light'
-            },
-            chart: {
-                id: 'realtime',
-                height: 350,
-                type: 'area',
-                // background: '#2A2E32',
-                fontFamily: 'Roboto, sans-serif',
-                animations: {
-                    enabled: true,
-                    easing: 'linear',
-                    dynamicAnimation: {
-                        speed: 500
-                    }
-                },
-                toolbar: {
-                    show: false
-                },
-                zoom: {
-                    enabled: false
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                width: '2'
-            },
-            title: {
-                text: 'Temperatur',
-                align: 'center',
-            },
-            grid: {
-                show: true,
-                // borderColor: '#4f4f4f',
-                xaxis: {
-                    lines: {
-                        show: true
-                    }
-                },
-                yaxis: {
-                    lines: {
-                        show: true
-                    }
-                },
-            },
-            tooltip: {
-                enabled: false
-            },
-            markers: {
-                size: 0
-            },
-            xaxis: {
-                type: 'datetime',
-                range: 60000,
-                labels: {
-                    formatter: function (value, timestamp) {
-                        date = new Date(timestamp)
-                        return date.getHours().toString().padStart(2, '0') + ":" +
-                            date.getMinutes().toString().padStart(2, '0') + ":" +
-                            date.getSeconds().toString().padStart(2, '0') // The formatter function overrides format property
-                    },
-                },
-                tickAmount: 10,
-            },
-            yaxis: {
-                min: 0,
-                max: 100,
-                labels: {
-                    formatter: function (value) {
-                        return value + "°C"
-                    },
-                }
-            },
-            legend: {
-                show: false
-            },
-        };
-        var optionsAkku = {
-            series: [90],
-            chart: {
-                height: 350,
-                type: 'radialBar',
-                toolbar: {
-                    show: false
-                }
-            },
-            plotOptions: {
-                radialBar: {
-                    startAngle: -360,
-                    endAngle: 0,
-                    hollow: {
-                        margin: 0,
-                        size: '70%',
-                        background: '#fff',
-                        position: 'front',
-                        dropShadow: {
-                            enabled: true,
-                            top: 3,
-                            left: 0,
-                            blur: 4,
-                            opacity: 0.24
-                        }
-                    },
-                    track: {
-                        background: '#fff',
-                        strokeWidth: '67%',
-                        margin: 0, // margin is in pixels
-                        dropShadow: {
-                            enabled: true,
-                            top: -3,
-                            left: 0,
-                            blur: 4,
-                            opacity: 0.35
-                        }
-                    },
-
-                    dataLabels: {
-                        show: true,
-                        name: {
-                            offsetY: -10,
-                            show: true,
-                            color: '#888',
-                            fontSize: '17px'
-                        },
-                        value: {
-                            formatter: function (val) {
-                                return parseInt(val) + "%";
-                            },
-                            color: '#111',
-                            fontSize: '36px',
-                            show: true,
-                        }
-                    }
-                }
-            },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shade: 'dark',
-                    type: 'vertical',
-                    shadeIntensity: 0.5,
-                    gradientToColors: ['#ABE5A1'],
-                    inverseColors: true,
-                    opacityFrom: 1,
-                    opacityTo: 1,
-                    stops: [0, 100]
-                }
-            },
-            stroke: {
-                lineCap: 'round'
-            },
-            labels: ['Akkustand'],
-        };
-        var optionsStromsensren = {
-            series: [{
-                data: [0.5, 0.3, 0.6, 0.2, 0.7, 0.5, 2, 1.4, 0.3]
-            }],
-
-            chart: {
-                height: 350,
-                type: 'bar',
-                toolbar: {
-                    show: false
-                }
-            },
-            // colors: colors,
-            plotOptions: {
-                bar: {
-                    columnWidth: '50%',
-                    distributed: false,
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            legend: {
-                show: false
-            },
-            xaxis: {
-                categories: [
-                    'Servo VL',
-                    'Servo ML',
-                    'Servo HL',
-                    'Servo VR',
-                    'Servo MR',
-                    'Servo HR',
-                    'Spannungswandler L',
-                    'Spannungswandler R',
-                    ['Sensoren', 'Lichter']
-
-                ],
-                labels: {
-                    style: {
-                        // colors: colors,
-                        fontSize: '12px'
-                    }
-                }
-            },
-            yaxis: {
-                min: 0,
-                max: 5,
-
-                labels: {
-                    formatter: function (value) {
-                        return value.toFixed(2) + "A"
-                    },
-                }
-            }
-        };
-        var chartTemperatur = new ApexCharts(document.querySelector("#temperatur"), optionsTemperatur);
-        var chartAkku = new ApexCharts(document.querySelector("#akku"), optionsAkku);
-        var chartStromsensoren = new ApexCharts(document.querySelector("#stromsensoren"), optionsStromsensren);
-
-        chartTemperatur.render();
-        chartAkku.render();
-        chartStromsensoren.render();
-
-        window.setInterval(function () {
-
-
-            // chart.animations.enabled = true;
-            getNewSeries(Date.now(), {
-                min: 60,
-                max: 65
-            })
-
-            chartTemperatur.updateSeries([{
-                data: data
-            }])
-            // chart2.updateSeries([{
-            //     data: data
-            // }])
-
-        }, 500)
-
-    </script>
-
-    <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
-            crossorigin="anonymous"></script>
-
-    <script src="./node_modules/feather-icons/dist/feather.min.js"></script>
-    <script>
-        feather.replace()
-    </script>
+<script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="./node_modules/feather-icons/dist/feather.min.js"></script>
+<script>
+    feather.replace()
+</script>
 </body>
 </html>
