@@ -1,31 +1,128 @@
-var data = []
+var dataStromaufnahme = []
+var dataStromsensoren = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+var dataTemperatur = []
 
-function getNewSeries(date, yrange) {
-
+function getNewSeries(data, date, yrange) {
     data.push({
         x: date,
         y: Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
     })
 }
 
-function removeData() {
-    // Alternatively, you can also reset the data at certain intervals to prevent creating a huge series
-    if (data.length % 60 === 0) {
-        console.log(data)
+function getNewStromsensoren(data) {
+    for (var i = 0; i < data.length; i++) {
+        data[i] = Math.floor(Math.random() * 4) + 1
     }
-    if (data.length > 120) {
-        data.shift()
-    }
-    // if(data.length > 160){
-    //     console.log(data)
-    //     // data = data.slice(data.length - 130, data.length);
-    //     console.log(data)
-    // }
 }
 
+// function removeData() {
+//     if (data.length % 20 == 0) {
+//         console.log(data)
+//     }
+//     if (data.length % 150 === 0) {
+//         data = data.slice(data.length - 120, data.length)
+//     }
+// }
+
+var optionsStromaufnahme = {
+    series: [{
+        data: dataStromaufnahme.slice()
+    }],
+    theme: {
+        mode: 'dark'
+    },
+    chart: {
+        id: 'realtime',
+        height: 350,
+        type: 'area',
+        background: '#323438',
+        fontFamily: 'Roboto, sans-serif',
+        animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+                speed: 400
+            }
+        },
+        events: {
+            animationEnd: function (chartCtx, options) {
+                if (dataStromaufnahme.length % 150 === 0) {
+                    dataStromaufnahme = dataStromaufnahme.slice(dataStromaufnahme.length - 140, dataStromaufnahme.length)
+                    chartCtx.updateOptions({
+                        series: [
+                            {data: dataStromaufnahme.slice()}
+                        ]
+                    }, false, false)
+                }
+            }
+        },
+        toolbar: {
+            show: false
+        },
+        zoom: {
+            enabled: false
+        }
+    },
+    dataLabels: {
+        enabled: false
+    },
+    stroke: {
+        curve: 'smooth',
+        width: '2'
+    },
+    title: {
+        text: 'Gesamt-Stromaufnahme',
+        align: 'center',
+    },
+    grid: {
+        show: true,
+        borderColor: '#4f4f4f',
+        xaxis: {
+            lines: {
+                show: true
+            }
+        },
+        yaxis: {
+            lines: {
+                show: true
+            }
+        },
+    },
+    tooltip: {
+        enabled: false
+    },
+    markers: {
+        size: 0
+    },
+    xaxis: {
+        type: 'datetime',
+        range: 60000,
+        labels: {
+            formatter: function (value, timestamp) {
+                date = new Date(timestamp)
+                return date.getHours().toString().padStart(2, '0') + ":" +
+                    date.getMinutes().toString().padStart(2, '0') + ":" +
+                    date.getSeconds().toString().padStart(2, '0') // The formatter function overrides format property
+            },
+        },
+        tickAmount: 10,
+    },
+    yaxis: {
+        min: 0,
+        max: 12,
+        labels: {
+            formatter: function (value) {
+                return value.toFixed(1) + "A"
+            },
+        }
+    },
+    legend: {
+        show: false
+    },
+};
 var optionsTemperatur = {
     series: [{
-        data: data.slice()
+        data: dataTemperatur.slice()
     }],
     theme: {
         mode: 'dark'
@@ -48,6 +145,18 @@ var optionsTemperatur = {
         },
         zoom: {
             enabled: false
+        }
+    },
+    events: {
+        animationEnd: function (chartCtx, options) {
+            if (dataTemperatur.length % 150 === 0) {
+                dataTemperatur = dataTemperatur.slice(dataTemperatur.length - 140, dataTemperatur.length)
+                chartCtx.updateOptions({
+                    series: [
+                        {data: dataTemperatur.slice()}
+                    ]
+                }, false, false)
+            }
         }
     },
     dataLabels: {
@@ -96,10 +205,10 @@ var optionsTemperatur = {
     },
     yaxis: {
         min: 0,
-        max: 100,
+        max: 55,
         labels: {
             formatter: function (value) {
-                return value + "°C"
+                return value.toFixed(1) + "°C"
             },
         }
     },
@@ -187,9 +296,9 @@ var optionsAkku = {
     },
     labels: ['Akkustand'],
 };
-var optionsStromsensren = {
+var optionsStromsensoren = {
     series: [{
-        data: [0.5, 0.3, 0.6, 0.2, 0.7, 0.5, 2, 1.4, 0.3]
+        data: dataStromsensoren.slice()
     }],
     theme: {
         mode: 'dark'
@@ -198,6 +307,14 @@ var optionsStromsensren = {
         height: 350,
         type: 'bar',
         background: '#323438',
+        animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+                speed: 200
+            }
+
+        },
         toolbar: {
             show: false
         }
@@ -206,7 +323,6 @@ var optionsStromsensren = {
         text: 'Stromsensoren',
         align: 'center',
     },
-    // colors: colors,
     plotOptions: {
         bar: {
             columnWidth: '50%',
@@ -248,7 +364,7 @@ var optionsStromsensren = {
 
         labels: {
             formatter: function (value) {
-                return value.toFixed(2) + "A"
+                return value.toFixed(1) + "A"
             },
         }
     },
@@ -267,28 +383,45 @@ var optionsStromsensren = {
     },
 
 };
+
+var chartStromaufnahme = new ApexCharts(document.querySelector("#stromaufnahme"), optionsStromaufnahme);
 var chartTemperatur = new ApexCharts(document.querySelector("#temperatur"), optionsTemperatur);
 var chartAkku = new ApexCharts(document.querySelector("#akku"), optionsAkku);
-var chartStromsensoren = new ApexCharts(document.querySelector("#stromsensoren"), optionsStromsensren);
+var chartStromsensoren = new ApexCharts(document.querySelector("#stromsensoren"), optionsStromsensoren);
 
+chartStromaufnahme.render()
 chartTemperatur.render();
 chartAkku.render();
 chartStromsensoren.render();
 
+var count = 0
 window.setInterval(function () {
 
-
-    // chart.animations.enabled = true;
-    getNewSeries(Date.now(), {
-        min: 60,
-        max: 65
+    // removeData()
+    getNewSeries(dataStromaufnahme, Date.now(), {
+        min: 0.5,
+        max: 3
+    })
+    getNewSeries(dataTemperatur, Date.now(), {
+        min: 21,
+        max: 23
     })
 
-    chartTemperatur.updateSeries([{
-        data: data
+    if (count === 5) {
+        getNewStromsensoren(dataStromsensoren)
+        count = 0
+        chartStromsensoren.updateSeries([{
+            data: dataStromsensoren
+        }])
+    }
+    count ++
+
+    chartStromaufnahme.updateSeries([{
+        data: dataStromaufnahme
     }])
-    // chart2.updateSeries([{
-    //     data: data
-    // }])
+    chartTemperatur.updateSeries([{
+        data: dataTemperatur
+    }])
+
 
 }, 500)
