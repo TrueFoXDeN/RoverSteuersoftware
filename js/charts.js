@@ -396,35 +396,35 @@ chartAkku.render();
 chartStromsensoren.render();
 
 var count = 0
-window.setInterval(function () {
-
-    // removeData()
-    getNewSeries(dataStromaufnahme, Date.now(), {
-        min: 0.5,
-        max: 3
-    })
-    getNewSeries(dataTemperatur, Date.now(), {
-        min: 21,
-        max: 23
-    })
-
-    if (count === 5) {
-        getNewStromsensoren(dataStromsensoren)
-        count = 0
-        chartStromsensoren.updateSeries([{
-            data: dataStromsensoren.slice()
-        }])
-    }
-    count ++
-
-    chartStromaufnahme.updateSeries([{
-        data: dataStromaufnahme.slice()
-    }])
-
-
-    chartTemperatur.updateSeries([{
-        data: dataTemperatur.slice()
-    }])
-
-
-}, 500)
+// window.setInterval(function () {
+//
+//     // removeData()
+//     getNewSeries(dataStromaufnahme, Date.now(), {
+//         min: 0.5,
+//         max: 3
+//     })
+//     getNewSeries(dataTemperatur, Date.now(), {
+//         min: 21,
+//         max: 23
+//     })
+//
+//     if (count === 5) {
+//         getNewStromsensoren(dataStromsensoren)
+//         count = 0
+//         chartStromsensoren.updateSeries([{
+//             data: dataStromsensoren.slice()
+//         }])
+//     }
+//     count ++
+//
+//     chartStromaufnahme.updateSeries([{
+//         data: dataStromaufnahme.slice()
+//     }])
+//
+//
+//     chartTemperatur.updateSeries([{
+//         data: dataTemperatur.slice()
+//     }])
+//
+//
+// }, 500)
