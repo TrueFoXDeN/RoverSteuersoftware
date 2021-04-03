@@ -137,7 +137,7 @@ var optionsTemperatur = {
             enabled: true,
             easing: 'linear',
             dynamicAnimation: {
-                speed: 500
+                speed: 400
             }
         },
         toolbar: {
@@ -145,20 +145,21 @@ var optionsTemperatur = {
         },
         zoom: {
             enabled: false
-        }
-    },
-    events: {
-        animationEnd: function (chartCtx, options) {
-            if (dataTemperatur.length % 150 === 0) {
-                dataTemperatur = dataTemperatur.slice(dataTemperatur.length - 140, dataTemperatur.length)
-                chartCtx.updateOptions({
-                    series: [
-                        {data: dataTemperatur.slice()}
-                    ]
-                }, false, false)
+        },
+        events: {
+            animationEnd: function (chartCtx, options) {
+                if (dataTemperatur.length % 150 === 0) {
+                    dataTemperatur = dataTemperatur.slice(dataTemperatur.length - 140, dataTemperatur.length)
+                    chartCtx.updateOptions({
+                        series: [
+                            {data: dataTemperatur.slice()}
+                        ]
+                    }, false, false)
+                }
             }
         }
     },
+
     dataLabels: {
         enabled: false
     },
@@ -411,16 +412,18 @@ window.setInterval(function () {
         getNewStromsensoren(dataStromsensoren)
         count = 0
         chartStromsensoren.updateSeries([{
-            data: dataStromsensoren
+            data: dataStromsensoren.slice()
         }])
     }
     count ++
 
     chartStromaufnahme.updateSeries([{
-        data: dataStromaufnahme
+        data: dataStromaufnahme.slice()
     }])
+
+
     chartTemperatur.updateSeries([{
-        data: dataTemperatur
+        data: dataTemperatur.slice()
     }])
 
 
