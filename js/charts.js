@@ -1,6 +1,8 @@
 var dataStromaufnahme = []
 var dataStromsensoren = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 var dataTemperatur = []
+var dataLeistung = []
+var dataAkku = [0]
 
 function getNewSeries(data, date, yrange) {
     data.push({
@@ -14,15 +16,6 @@ function getNewStromsensoren(data) {
         data[i] = Math.floor(Math.random() * 4) + 1
     }
 }
-
-// function removeData() {
-//     if (data.length % 20 == 0) {
-//         console.log(data)
-//     }
-//     if (data.length % 150 === 0) {
-//         data = data.slice(data.length - 120, data.length)
-//     }
-// }
 
 var optionsStromaufnahme = {
     series: [{
@@ -113,6 +106,102 @@ var optionsStromaufnahme = {
         labels: {
             formatter: function (value) {
                 return value.toFixed(1) + "A"
+            },
+        }
+    },
+    legend: {
+        show: false
+    },
+};
+var optionsLeistung = {
+    series: [{
+        data: dataLeistung
+    }],
+    theme: {
+        mode: 'dark'
+    },
+    chart: {
+        id: 'realtime',
+        height: 350,
+        type: 'area',
+        background: '#323438',
+        fontFamily: 'Roboto, sans-serif',
+        animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+                speed: 400
+            }
+        },
+        events: {
+            animationEnd: function (chartCtx, options) {
+                if (dataLeistung.length % 150 === 0) {
+                    dataLeistung = dataLeistung.slice(dataLeistung.length - 140, dataLeistung.length)
+                    chartCtx.updateOptions({
+                        series: [
+                            {data: dataLeistung.slice()}
+                        ]
+                    }, false, false)
+                }
+            }
+        },
+        toolbar: {
+            show: false
+        },
+        zoom: {
+            enabled: false
+        }
+    },
+    dataLabels: {
+        enabled: false
+    },
+    stroke: {
+        curve: 'smooth',
+        width: '2'
+    },
+    title: {
+        text: 'Gesamt-Leistung',
+        align: 'center',
+    },
+    grid: {
+        show: true,
+        borderColor: '#4f4f4f',
+        xaxis: {
+            lines: {
+                show: true
+            }
+        },
+        yaxis: {
+            lines: {
+                show: true
+            }
+        },
+    },
+    tooltip: {
+        enabled: false
+    },
+    markers: {
+        size: 0
+    },
+    xaxis: {
+        type: 'datetime',
+        range: 60000,
+        labels: {
+            formatter: function (value, timestamp) {
+                date = new Date(timestamp)
+                return date.getHours().toString().padStart(2, '0') + ":" +
+                    date.getMinutes().toString().padStart(2, '0') + ":" +
+                    date.getSeconds().toString().padStart(2, '0') // The formatter function overrides format property
+            },
+        },
+        tickAmount: 10,
+    },
+    yaxis: {
+        min: 0,
+        max: 70,
+        labels: {
+            formatter: function (value) {
+                return value + "W"
             },
         }
     },
@@ -218,7 +307,7 @@ var optionsTemperatur = {
     },
 };
 var optionsAkku = {
-    series: [90],
+    series: dataAkku,
     theme: {
         mode: 'dark'
     },
@@ -341,14 +430,14 @@ var optionsStromsensoren = {
     },
     xaxis: {
         categories: [
-            'Servo VL',
-            'Servo ML',
-            'Servo HL',
             'Servo VR',
             'Servo MR',
             'Servo HR',
-            'Spannungswandler L',
+            'Servo VL',
+            'Servo ML',
+            'Servo HL',
             'Spannungswandler R',
+            'Spannungswandler L',
             ['Sensoren', 'Lichter']
 
         ],
@@ -386,45 +475,71 @@ var optionsStromsensoren = {
 };
 
 var chartStromaufnahme = new ApexCharts(document.querySelector("#stromaufnahme"), optionsStromaufnahme);
+var chartLeistung = new ApexCharts(document.querySelector("#leistung"), optionsLeistung);
 var chartTemperatur = new ApexCharts(document.querySelector("#temperatur"), optionsTemperatur);
 var chartAkku = new ApexCharts(document.querySelector("#akku"), optionsAkku);
 var chartStromsensoren = new ApexCharts(document.querySelector("#stromsensoren"), optionsStromsensoren);
 
 chartStromaufnahme.render()
+chartLeistung.render()
 chartTemperatur.render();
 chartAkku.render();
 chartStromsensoren.render();
 
 var count = 0
-// window.setInterval(function () {
-//
-//     // removeData()
-//     getNewSeries(dataStromaufnahme, Date.now(), {
-//         min: 0.5,
-//         max: 3
-//     })
-//     getNewSeries(dataTemperatur, Date.now(), {
-//         min: 21,
-//         max: 23
-//     })
-//
-//     if (count === 5) {
-//         getNewStromsensoren(dataStromsensoren)
-//         count = 0
-//         chartStromsensoren.updateSeries([{
-//             data: dataStromsensoren.slice()
-//         }])
-//     }
-//     count ++
-//
-//     chartStromaufnahme.updateSeries([{
-//         data: dataStromaufnahme.slice()
-//     }])
-//
-//
-//     chartTemperatur.updateSeries([{
-//         data: dataTemperatur.slice()
-//     }])
-//
-//
-// }, 500)
+function sampleData() {
+    window.setInterval(function () {
+
+        getNewSeries(dataStromaufnahme, Date.now(), {
+            min: 0.5,
+            max: 3
+        })
+        getNewSeries(dataTemperatur, Date.now(), {
+            min: 21,
+            max: 23
+        })
+
+        if (count === 5) {
+            getNewStromsensoren(dataStromsensoren)
+            count = 0
+            chartStromsensoren.updateSeries([{
+                data: dataStromsensoren.slice()
+            }])
+        }
+        count++
+
+        chartStromaufnahme.updateSeries([{
+            data: dataStromaufnahme.slice()
+        }])
+
+
+        chartTemperatur.updateSeries([{
+            data: dataTemperatur.slice()
+        }])
+
+    }, 500)
+}
+
+function processData(values){
+    dataAkku[0] = values[0]
+    chartAkku.updateSeries([{
+        data: dataAkku
+    }])
+
+    for(var i = 1; i<=9; i++){
+        dataStromsensoren[i] = values[i]
+    }
+    chartStromsensoren.updateSeries([{
+        data: dataStromsensoren
+    }])
+
+    dataStromaufnahme.push(values[11])
+    chartStromaufnahme.updateSeries([{
+        data: dataStromaufnahme
+    }])
+
+    dataLeistung.push(values[12])
+    chartLeistung.updateSeries([{
+        data: dataLeistung
+    }])
+}
