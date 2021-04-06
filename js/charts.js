@@ -2,7 +2,7 @@ var dataStromaufnahme = []
 var dataStromsensoren = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 var dataTemperatur = []
 var dataLeistung = []
-var dataAkku = [0]
+var dataAkku = [100]
 
 function getNewSeries(data, date, yrange) {
     data.push({
@@ -226,7 +226,7 @@ var optionsTemperatur = {
             enabled: true,
             easing: 'linear',
             dynamicAnimation: {
-                speed: 400
+                speed: 450
             }
         },
         toolbar: {
@@ -307,7 +307,7 @@ var optionsTemperatur = {
     },
 };
 var optionsAkku = {
-    series: dataAkku,
+    series: dataAkku.slice(),
     theme: {
         mode: 'dark'
     },
@@ -317,7 +317,14 @@ var optionsAkku = {
         background: '#323438',
         toolbar: {
             show: false
-        }
+        },
+        animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+                speed: 400
+            }
+        },
     },
     plotOptions: {
         radialBar: {
@@ -398,10 +405,10 @@ var optionsStromsensoren = {
         type: 'bar',
         background: '#323438',
         animations: {
-            enabled: true,
+            enabled: false,
             easing: 'linear',
             dynamicAnimation: {
-                speed: 200
+                speed: 250
             }
 
         },
@@ -418,6 +425,9 @@ var optionsStromsensoren = {
             columnWidth: '50%',
             distributed: false,
         }
+    },
+    tooltip: {
+        enabled: false
     },
     dataLabels: {
         enabled: false
@@ -486,7 +496,7 @@ chartTemperatur.render();
 chartAkku.render();
 chartStromsensoren.render();
 
-var count = 0
+// var count = 0
 function sampleData() {
     window.setInterval(function () {
 
@@ -499,7 +509,7 @@ function sampleData() {
             max: 23
         })
 
-        if (count === 5) {
+        if (count === 2) {
             getNewStromsensoren(dataStromsensoren)
             count = 0
             chartStromsensoren.updateSeries([{
@@ -520,25 +530,48 @@ function sampleData() {
     }, 500)
 }
 
+const clamp = (a, min = 0, max = 1) => Math.min(max, Math.max(min, a));
+const invlerp = (x, y, a) => clamp((a - x) / (y - x));
+var count = 0
 function processData(values){
-    dataAkku[0] = values[0]
-    chartAkku.updateSeries([{
-        data: dataAkku
-    }])
+    let akkuspannung = values[0] / 1000
+    let maxspannung = 12.6
+    let minspannung = 11.22
+    let stromaufnahme = values[10] / 1000
 
-    for(var i = 1; i<=9; i++){
-        dataStromsensoren[i] = values[i]
+    let akku = Math.round(invlerp(minspannung, maxspannung, akkuspannung) *100)
+
+    dataAkku[0] = akku
+    console.log(akku)
+    chartAkku.updateSeries(
+        dataAkku
+    )
+
+    for(let i = 1; i<=9; i++){
+        dataStromsensoren[i-1] = values[i] / 1000
     }
-    chartStromsensoren.updateSeries([{
-        data: dataStromsensoren
-    }])
+     // if(count === 1){
+        chartStromsensoren.updateSeries([{
+            data: dataStromsensoren
+        }])
+        // count = 0
+     // }
+     // count ++
 
-    dataStromaufnahme.push(values[11])
+
+    dataStromaufnahme.push({
+        x: Date.now(),
+        y: stromaufnahme
+    })
     chartStromaufnahme.updateSeries([{
         data: dataStromaufnahme
     }])
 
-    dataLeistung.push(values[12])
+
+    dataLeistung.push({
+        x: Date.now(),
+        y: akkuspannung * stromaufnahme
+    })
     chartLeistung.updateSeries([{
         data: dataLeistung
     }])

@@ -37,12 +37,10 @@ function startClient(){
     });
 
     client.on('data', function (data) {
-        console.log("" + data);
-        buffer += data.toString().replace("\n", "") + "\n"
-        // var stream = fs.createWriteStream("test.txt", {flags:'a'});
-        // stream.write(""+data)
-        // stream.end()
-        // fs.appendFile('test.txt', ""+data, function (){})
+        let res = data.toString().replace("\n","") + "%"
+        buffer += res
+        console.log(data.toString())
+        //rov;11969;___18;___79;___51;___12;___56;___78;___43;___42;____0;__379
     });
     client.on('error', function (e) {
         if(e.code === 'ECONNRESET'){
